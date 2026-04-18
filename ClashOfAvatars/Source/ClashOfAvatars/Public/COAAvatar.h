@@ -23,6 +23,24 @@ public:
 	UPROPERTY(EditAnywhere,Category = "COA")
 	float RunSpeed;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "COA")
+	float Stamina;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "COA")
+	float MaxStamina;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "COA")
+	float StaminaDrainRate;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "COA")
+	float StaminaGainRate;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "COA")
+	bool bStaminaDrained;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "COA")
+	bool bRunning;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Character")
 	UCameraComponent* mCamera;
 
@@ -30,6 +48,7 @@ public:
 	USpringArmComponent* mSpringArm;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	void Tick(float DeltaTime);
 
 private:
 
@@ -38,6 +57,8 @@ private:
 
 	void RunPressed();
 	void RunReleased();
+
+	void UpdateMovmentParams();
 
 	//Helper methods :)
 	FRotator GetYaw();

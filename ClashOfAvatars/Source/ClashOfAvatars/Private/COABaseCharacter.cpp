@@ -24,7 +24,6 @@ WalkSpeed(100.0f)
 void ACOABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

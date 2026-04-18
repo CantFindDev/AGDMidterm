@@ -6,8 +6,17 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 ACOAAvatar::ACOAAvatar() :
-RunSpeed(300.0f)
+RunSpeed(300.0f),
+MaxStamina(100.0f),
+StaminaGainRate(10),
+StaminaDrainRate(15),
+bStaminaDrained(false),
+bRunning(false)
 {
+	PrimaryActorTick.bCanEverTick = true;
+
+	Stamina = MaxStamina;
+
 	mSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	mSpringArm->TargetArmLength = 300.0f;
 	mSpringArm->SetupAttachment(RootComponent);
@@ -37,15 +46,59 @@ void ACOAAvatar::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction("Run",IE_Released,this,&ACOAAvatar::RunReleased);
 }
 
+void ACOAAvatar::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	bool bIsMoving = GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking;
+
+	if (bRunning && bIsMoving && !bStaminaDrained)
+	{
+		Stamina -= StaminaDrainRate * DeltaTime;
+
+		if (Stamina <= 0.0f)
+		{
+			Stamina = 0.0f;
+			bStaminaDrained = true;
+			RunReleased();
+		}
+		return;
+	}
+
+	if (Stamina < MaxStamina)
+	{
+		Stamina += StaminaGainRate * DeltaTime;
+
+		if (Stamina >= MaxStamina)
+		{
+			Stamina = MaxStamina;
+			bStaminaDrained = false;
+		}
+	}
+}
+
 
 void ACOAAvatar::RunPressed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+	if (bStaminaDrained)
+	{
+		RunReleased();
+		return;
+	}
+	bRunning = true;
+	UpdateMovmentParams();
 }
 
 void ACOAAvatar::RunReleased()
 {
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (!bRunning) return;
+	bRunning = false;
+	UpdateMovmentParams();
+}
+
+void ACOAAvatar::UpdateMovmentParams()
+{
+	GetCharacterMovement()->MaxWalkSpeed = bRunning ? RunSpeed : WalkSpeed;
 }
 
 void ACOAAvatar::MoveForward(float value)
