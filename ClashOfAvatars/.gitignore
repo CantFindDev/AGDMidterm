@@ -12,7 +12,6 @@
 !/*.uproject
 
 # Do not ignore source, config and plugins dirs.
-!/ClashOfAvatars/**
 !/Source/**
 !/Config/**
 !/Plugins/**
